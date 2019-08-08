@@ -15,47 +15,60 @@ class Login extends Component {
   };
   handleSubmit = event => {
     event.preventDefault();
-    const {email, password} = this.state;
-    console.log(email, password);
-    auth
-      .login(email, password)
-      .then(user => {
-        console.log(user);
-        this.setState({
-          error: null,
+    const {email, password, error} = this.state;
+    if (email === '' || password === '') {
+      this.setState({error: 'Error : Form Data Required!'});
+    } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+      this.setState({error: 'Error : Email Is Invalid!'});
+    } else {
+      auth
+        .login(email, password)
+        .then(user => {
+          console.log(user);
+          this.setState({
+            error: null,
+          });
+          history.push('/home');
+        })
+        .catch(error => {
+          this.setState({
+            error: 'Error : ' + error.message,
+          });
         });
-        history.push('/home');
-      })
-      .catch(error => {
-        this.setState({
-          error: error.message,
-        });
-      });
+    }
   };
   render() {
     const {email, password, error} = this.state;
     return (
-      <>
-        <p>Login Form </p>
+      <div className="container my-5">
+        <h5>Login Form </h5>
         <form onSubmit={this.handleSubmit}>
-          <input
-            type="email"
-            name="email"
-            placeholder="Enter Email"
-            value={email}
-            onChange={this.handleInputChange}
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Enter Password"
-            value={password}
-            onChange={this.handleInputChange}
-          />
-          <button type="submit">Sign In</button>
+          <div className="form-group">
+            <input
+              type="text"
+              name="email"
+              className="form-control"
+              placeholder="Enter Email"
+              value={email}
+              onChange={this.handleInputChange}
+            />
+          </div>
+          <div className="form-group">
+            <input
+              type="password"
+              name="password"
+              className="form-control"
+              placeholder="Enter Password"
+              value={password}
+              onChange={this.handleInputChange}
+            />
+          </div>
+          <button type="submit" className="btn btn-primary float-left">
+            Submit
+          </button>
+          <p className="text-danger float-right">{error}</p>
         </form>
-        <h4>{error}</h4>
-      </>
+      </div>
     );
   }
 }
